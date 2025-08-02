@@ -59,7 +59,7 @@ st_data = st_folium(m, width=700, height=500)
 
 # 替換成靜態圖片（改為你預產生的 academic 風格圖）
 st.subheader("📈 Actual vs Predicted Trend Over Time")
-st.image("trend_plot_academic.png", caption="Trend of Predicted vs Actual Outbreaks", use_column_width=True)
+st.image("trend_plot_academic.png", caption="Trend of Predicted vs Actual Outbreaks", use_container_width=True)
 
 # 高風險摘要表格
 st.subheader("📋 High-Risk Summary Table")
