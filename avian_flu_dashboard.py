@@ -7,6 +7,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 from io import StringIO
 
+# 資料讀取
 df = pd.read_csv("cleaned_bird_flu.csv")
 pred = pd.read_csv("prediction_vs_actual.csv")
 
@@ -23,11 +24,13 @@ This dashboard helps monitor and analyze potential H5 HPAI outbreaks.
 Use the sidebar filters to explore predictions by region, species, and time.
 """)
 
+# 側邊欄篩選器
 st.sidebar.header("Filter Options")
 county = st.sidebar.multiselect("Select County", df_results["County"].unique())
 month = st.sidebar.multiselect("Select Month", sorted(df_results["Month"].unique()))
 species = st.sidebar.multiselect("Select Parent Species", df_results["Parent_Species"].unique())
 
+# 資料篩選
 filtered = df_results.copy()
 if county:
     filtered = filtered[filtered["County"].isin(county)]
@@ -36,6 +39,7 @@ if month:
 if species:
     filtered = filtered[filtered["Parent_Species"].isin(species)]
 
+# 地圖顯示
 st.subheader("📍 Predicted Outbreak Hotspots")
 map_center = [filtered["Latitude"].mean(), filtered["Longitude"].mean()] if not filtered.empty else [0, 0]
 m = folium.Map(location=map_center, zoom_start=4)
@@ -53,16 +57,11 @@ for _, row in filtered[filtered["Predicted"] == 1].iterrows():
 
 st_data = st_folium(m, width=700, height=500)
 
+# 替換成靜態圖片（改為你預產生的 academic 風格圖）
 st.subheader("📈 Actual vs Predicted Trend Over Time")
-fig, ax = plt.subplots(figsize=(10, 4))
-filtered_sorted = filtered.sort_values(by="Date")
-sns.lineplot(data=filtered_sorted, x="Date", y="Actual", label="Actual", ax=ax)
-sns.lineplot(data=filtered_sorted, x="Date", y="Predicted", label="Predicted", ax=ax)
-ax.set_title("Outbreak Trend")
-ax.set_ylabel("Outbreak (0 = No, 1 = Yes)")
-ax.set_xlabel("Date")
-st.pyplot(fig)
+st.image("trend_plot_academic.png", caption="Trend of Predicted vs Actual Outbreaks", use_column_width=True)
 
+# 高風險摘要表格
 st.subheader("📋 High-Risk Summary Table")
 summary = (
     filtered[filtered["Predicted"] == 1]
@@ -71,9 +70,9 @@ summary = (
     .reset_index(name="Predicted_Outbreaks")
     .sort_values(by="Predicted_Outbreaks", ascending=False)
 )
-
 st.dataframe(summary)
 
+# 政策建議
 st.subheader("🧠 Policy Recommendations")
 policy_text = f"""
 Recommendations:
@@ -84,6 +83,7 @@ Recommendations:
 """
 st.text_area("Generated Recommendation:", policy_text, height=180)
 
+# 報告下載
 st.subheader("📦 Download Reports")
 csv_buf = StringIO()
 summary.to_csv(csv_buf, index=False)
